@@ -51,8 +51,11 @@ jobs:
           DEV_IMAGE_TAG: dev
       run: |
          docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION  }}.amazonaws.com/${{ env.ECR_REPOSITORY_DEV }}:${{ env.DEV_IMAGE_TAG }}${{ steps.increment_dev_tag.outputs.dev_tag }} .
+         docker images
          aws ecr get-login-password --region ${{ secrets.AWS_DEFAULT_REGION  }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com
-         docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/flask-app:dev ${{ steps.increment_dev_tag.outputs.dev_tag }}
+         docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY_DEV }}:${{ env.DEV_IMAGE_TAG }} ${{ steps.increment_dev_tag.outputs.dev_tag }}
+
+         
     # - name: Pull Docker Image Conditionaly
     #   if: steps.check_file_changed.outputs.docker_package_changed == 'true'
     #   env: 
