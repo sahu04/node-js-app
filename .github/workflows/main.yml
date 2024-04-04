@@ -4,6 +4,16 @@ on:
     branches:
       - 'master'
       - 'prod'
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+  ECR_REPOSITORY_DEV: ${{ secrets.ECR_REPOSITORY_DEV }}
+  ECR_REPOSITORY_PROD: ${{ secrets.ECR_REPOSITORY_PROD }}
+# S3_BUCKET_NAME_DEV: ${{ secrets.S3_BUCKET_NAME_DEV }}
+# S3_BUCKET_NAME_PROD: ${{ secrets.S3_BUCKET_NAME_PROD }}
+# CDN_DISTRIBUTION_ID_DEV: ${{ secrets.CDN_DISTRIBUTION_ID_DEV }}
+# CDN_DISTRIBUTION_ID_PROD: ${{ secrets.CDN_DISTRIBUTION_ID_PROD }}
 
 jobs:
   conditional_step:
