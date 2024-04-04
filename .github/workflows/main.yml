@@ -1,0 +1,57 @@
+name: Build Docker Image
+on:
+  push:
+    branches:
+      - 'master'
+      - 'prod'
+
+jobs:
+  conditional_step:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        # Checkout as many commits as needed for the diff
+        fetch-depth: 2
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+           aws-region: ap-south-1
+    - name: Check for Dockerfile or package.json changes
+      id: check_file_changed
+      run: |
+        # Diff HEAD with the previous commit
+        diff=$(git diff --name-only HEAD^ HEAD)
+        
+        # Check if Dockerfile or package.json has changed (added, modified, deleted)
+        if echo "$diff" | grep -qE '^(Dockerfile|package\.json)$'; then
+          echo "::set-output name=docker_package_changed::true"
+        else
+          echo "::set-output name=docker_package_changed::false"
+        fi
+   
+    - name: Build Docker Image Conditionaly
+      if: (github.event_name == 'push' && github.ref == 'refs/heads/prod') || (github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.check_file_changed.outputs.docker_package_changed == 'true')
+      #if: steps.check_file_changed.outputs.docker_package_changed == 'true'
+      run: |
+        docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION  }}.amazonaws.com/flask-app:dev-${{ steps.increment_dev_tag.outputs.dev_tag }} .
+        aws ecr get-login-password --region ${{ secrets.AWS_DEFAULT_REGION  }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com
+        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/flask-app:dev-${{ steps.increment_dev_tag.outputs.dev_tag }}
+    # - name: Pull Docker Image Conditionaly
+    #   if: steps.check_file_changed.outputs.docker_package_changed == 'true'
+    #   env: 
+    #         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+    #         IMAGE_TAG: prod
+    #         DEV_IMAGE_TAG: dev
+    #   run: |
+    #    docker pull $ECR_REGISTRY/$ECR_REPOSITORY_DEV:$DEV_IMAGE_TAG
+    #    docker tag $ECR_REGISTRY/$ECR_REPOSITORY_DEV:$DEV_IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY_PROD:$IMAGE_TAG
+    #    docker push $ECR_REGISTRY/$ECR_REPOSITORY_PROD:$IMAGE_TAG
+    
+    - name: Deploy build to S3
+      run: |
+          npm run deploy-dev
+          aws s3 sync --delete build s3://s3-bucket-github --acl public-read
+          # aws cloudfront create-invalidation --distribution-id=${{ secrets.CDN_DISTRIBUTION_ID_DEV }} --paths "/*"
