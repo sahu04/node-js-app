@@ -50,10 +50,10 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           DEV_IMAGE_TAG: dev
       run: |
-         docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION  }}.amazonaws.com/${{ env.ECR_REPOSITORY_DEV }}:${{ env.DEV_IMAGE_TAG }}${{ steps.increment_dev_tag.outputs.dev_tag }} .
+         docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION  }}.amazonaws.com/${{ env.ECR_REPOSITORY_DEV }}:${{ env.DEV_IMAGE_TAG }} .
          docker images
          aws ecr get-login-password --region ${{ secrets.AWS_DEFAULT_REGION  }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com
-         docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY_DEV }}:${{ env.DEV_IMAGE_TAG }} ${{ steps.increment_dev_tag.outputs.dev_tag }}
+         docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY_DEV }}:${{ env.DEV_IMAGE_TAG }} 
 
          
     # - name: Pull Docker Image Conditionaly
@@ -66,10 +66,10 @@ jobs:
     #    docker pull $ECR_REGISTRY/$ECR_REPOSITORY_DEV:$DEV_IMAGE_TAG
     #    docker tag $ECR_REGISTRY/$ECR_REPOSITORY_DEV:$DEV_IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY_PROD:$IMAGE_TAG
     #    docker push $ECR_REGISTRY/$ECR_REPOSITORY_PROD:$IMAGE_TAG
-    - name: Run prettier
-      run: npm run format:check
-    - name: Deploy build to S3
-      run: |
-          npm run deploy-dev
-          aws s3 sync --delete build s3://s3-bucket-github --acl public-read
-          # aws cloudfront create-invalidation --distribution-id=${{ secrets.CDN_DISTRIBUTION_ID_DEV }} --paths "/*"
+    # - name: Run prettier
+    #   run: npm run format:check
+    # - name: Deploy build to S3
+    #   run: |
+    #       npm run deploy-dev
+    #       aws s3 sync --delete build s3://s3-bucket-github --acl public-read
+    #       # aws cloudfront create-invalidation --distribution-id=${{ secrets.CDN_DISTRIBUTION_ID_DEV }} --paths "/*"
