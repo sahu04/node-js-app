@@ -33,7 +33,7 @@ jobs:
         fi
    
     - name: Build Docker Image Conditionaly
-      if: (github.event_name == 'push' && github.ref == 'refs/heads/prod') || (github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.check_file_changed.outputs.docker_package_changed == 'true')
+      if: (github.event_name == 'push' && github.ref == 'refs/heads/prod') || (github.event_name == 'push' && github.ref == 'refs/heads/master' && steps.check_file_changed.outputs.docker_package_changed == 'true')
       #if: steps.check_file_changed.outputs.docker_package_changed == 'true'
       run: |
         docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION  }}.amazonaws.com/flask-app:dev-${{ steps.increment_dev_tag.outputs.dev_tag }} .
