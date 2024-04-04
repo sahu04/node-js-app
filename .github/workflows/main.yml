@@ -50,7 +50,7 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           DEV_IMAGE_TAG: dev
       run: |
-         docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION  }}.amazonaws.com/${{ env.ECR_REPOSITORY_DEV }}:${{ env.DEV_IMAGE_TAG }}${{ steps.increment_dev_tag.outputs.dev_tag }} .
+         docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION  }}.amazonaws.com/${{ env.ECR_REPOSITORY_DEV }}:${{ env.DEV_IMAGE_TAG }} .
          docker images
          aws ecr get-login-password --region ${{ secrets.AWS_DEFAULT_REGION  }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com
          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY_DEV }}:${{ env.DEV_IMAGE_TAG }}${{ steps.increment_dev_tag.outputs.dev_tag }}
