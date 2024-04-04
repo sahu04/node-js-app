@@ -43,7 +43,8 @@ jobs:
         fi
    
     - name: Build Docker Image Conditionaly
-      if: (github.event_name == 'push' && github.ref == 'refs/heads/prod') || (github.event_name == 'push' && github.ref == 'refs/heads/master' && steps.check_file_changed.outputs.docker_package_changed == 'true')
+      if: (github.event_name == 'push' && github.ref == 'refs/heads/master' && steps.check_file_changed.outputs.docker_package_changed == 'true')
+      # if: (github.event_name == 'push' && github.ref == 'refs/heads/prod') || (github.event_name == 'push' && github.ref == 'refs/heads/master' && steps.check_file_changed.outputs.docker_package_changed == 'true')
       #if: steps.check_file_changed.outputs.docker_package_changed == 'true'
       env: 
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
