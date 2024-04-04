@@ -37,9 +37,9 @@ jobs:
         
         # Check if Dockerfile or package.json has changed (added, modified, deleted)
         if echo "$diff" | grep -qE '^(Dockerfile|package\.json)$'; then
-          echo "::set-output name=docker_package_changed::true"
+          echo "docker_package_changed=true" >> $GITHUB_OUTPUT
         else
-          echo "::set-output name=docker_package_changed::false"
+          echo "docker_package_changed=false" >> $GITHUB_OUTPUT
         fi
    
     - name: Build Docker Image Conditionaly
