@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "format:check": "eslint --ext .js,.jsx ."
   },
   "repository": {
     "type": "git",
@@ -17,9 +18,4 @@
     "url": "https://github.com/sahu04/node-js-app/issues"
   },
   "homepage": "https://github.com/sahu04/node-js-app#readme"
-}
-{
-  "scripts": {
-    "format:check": "eslint --ext .js,.jsx ."
-  }
 }
