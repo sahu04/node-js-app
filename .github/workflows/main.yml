@@ -63,9 +63,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: public.ecr.aws/v1u7p7d8/testing-dev1:dev
-      credentials:
-        username: AWS
-        password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     steps:
       - name: Checkout Repo
