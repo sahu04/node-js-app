@@ -45,7 +45,7 @@ jobs:
         run: |
           docker build -t public.ecr.aws/${{ secrets.AWS_ACCOUNT_ID }}/${{ env.ECR_REPOSITORY }}:${{ env.DEV_IMAGE_TAG }} .
           docker images
-          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
+          aws ecr-public get-login-password --region ${{ secrets.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin public.ecr.aws
           docker push public.ecr.aws/${{ secrets.AWS_ACCOUNT_ID }}/${{ env.ECR_REPOSITORY }}:${{ env.DEV_IMAGE_TAG }}
 
   build-dev:
