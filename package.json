@@ -18,3 +18,8 @@
   },
   "homepage": "https://github.com/sahu04/node-js-app#readme"
 }
+{
+  "scripts": {
+    "format:check": "eslint --ext .js,.jsx ."
+  }
+}
