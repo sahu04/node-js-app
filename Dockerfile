@@ -14,3 +14,5 @@ RUN apk add python3 py-pip
 #RUN pip install awscli
 RUN pip install PyYAML==5.3.1 && pip install awscli
 
+
+
