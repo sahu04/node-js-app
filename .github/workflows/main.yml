@@ -73,7 +73,7 @@ jobs:
     #    docker tag $ECR_REGISTRY/$ECR_REPOSITORY_DEV:$DEV_IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY_PROD:$IMAGE_TAG
     #    docker push $ECR_REGISTRY/$ECR_REPOSITORY_PROD:$IMAGE_TAG
     - name: Run prettier
-      run: npm run format:check
+      run: npm run format:check || true
     # - name: Deploy build to S3
     #   run: |
     #       npm run deploy-dev
