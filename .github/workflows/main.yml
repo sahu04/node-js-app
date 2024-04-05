@@ -55,6 +55,7 @@ jobs:
          docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION  }}.amazonaws.com/testing-dev1:${{ env.DEV_IMAGE_TAG }} .
          docker images
           aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/v1u7p7d8
+          docker tag testing-dev1:dev public.ecr.aws/v1u7p7d8/testing-dev1:dev
           docker push public.ecr.aws/v1u7p7d8/testing-dev1:dev
          # aws ecr get-login-password --region ${{ secrets.AWS_DEFAULT_REGION  }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com
            #docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/testing-dev1:${{ env.DEV_IMAGE_TAG }}
