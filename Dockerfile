@@ -7,7 +7,7 @@ RUN mkdir /cache
 WORKDIR /cache
 COPY package.json ./
 COPY package-lock.json ./
-RUN apk install npm -y
+RUN apk add npm 
 RUN npm install -g npm-audit-html
 RUN npm install -g serverless@2.71.0
 RUN apk add python3 py-pip
