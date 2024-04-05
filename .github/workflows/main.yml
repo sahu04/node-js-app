@@ -84,7 +84,7 @@ jobs:
       - name: Run prettier
         run: |
          npm run format:check || true
-         npm start
+         npm build
         
     # - name: Deploy build to S3
     #   run: |
