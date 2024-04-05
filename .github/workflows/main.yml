@@ -8,7 +8,7 @@ env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-  ECR_REPOSITORY_DEV: ${{ secrets.ECR_REPOSITORY_DEV }}
+  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
   ECR_REPOSITORY_PROD: ${{ secrets.ECR_REPOSITORY_PROD }}
 
 jobs:
@@ -40,7 +40,7 @@ jobs:
         if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/prod')
         env:
           REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
-          ECR_REPOSITORY: testing-dev1
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
           DEV_IMAGE_TAG: dev
         run: |
           docker build -t public.ecr.aws/${{ secrets.AWS_ACCOUNT_ID }}/${{ env.ECR_REPOSITORY }}:${{ env.DEV_IMAGE_TAG }} .
