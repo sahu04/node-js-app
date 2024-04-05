@@ -62,7 +62,7 @@ jobs:
     name: build-dev
     runs-on: ubuntu-latest
     container:
-      image: 972720899290.dkr.ecr.ap-south-1.amazonaws.com/flask-app:dev
+      image: public.ecr.aws/v1u7p7d8/testing-dev1:dev
       credentials:
         username: AWS
         password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -80,5 +80,5 @@ jobs:
 
       - name: Run prettier and npm build
         run: |
-          npm run format:check || true
+          npm run format:check 
           # npm build
