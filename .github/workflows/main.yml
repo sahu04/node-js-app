@@ -35,7 +35,7 @@ jobs:
           else
             echo "docker_package_changed=false" >> $GITHUB_ENV
           fi
-             env: 
+           
       # - name: Build Docker Image Conditionally
       #   if: (github.event_name == 'push' && github.ref == 'refs/heads/master' && steps.check_file_changed.outputs.docker_package_changed == 'true')
       #   env: 
