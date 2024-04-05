@@ -77,5 +77,8 @@ jobs:
 
       - name: Run prettier and npm build
         run: |
+          docker images
+          docker ps -a
+          docker ps
           npm run format:check || true
           # npm build
