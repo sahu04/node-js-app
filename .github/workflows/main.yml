@@ -18,8 +18,8 @@ env:
 jobs:
   conditional_step:
     runs-on: ubuntu-latest
-    container:
-            image: 972720899290.dkr.ecr.ap-south-1.amazonaws.com/flask-app:dev
+    # container:
+    #         image: 972720899290.dkr.ecr.ap-south-1.amazonaws.com/flask-app:dev
     steps:
     - uses: actions/checkout@v3
       with:
