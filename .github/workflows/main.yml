@@ -19,7 +19,7 @@ jobs:
   conditional_step:
     runs-on: ubuntu-latest
     # container:
-    #         image: 972720899290.dkr.ecr.ap-south-1.amazonaws.com/flask-app:dev
+    #         image: public.ecr.aws/v1u7p7d8/testing-dev1:dev
     steps:
     - uses: actions/checkout@v3
       with:
