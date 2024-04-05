@@ -36,27 +36,27 @@ jobs:
             echo "docker_package_changed=false" >> $GITHUB_ENV
           fi
            
-      - name: Build Docker Image Conditionally
-        if: (github.event_name == 'push' && github.ref == 'refs/heads/master' && steps.check_file_changed.outputs.docker_package_changed == 'true')
-        env: 
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          DEV_IMAGE_TAG: dev
-        run: |
-          docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION  }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ env.DEV_IMAGE_TAG }} .
-          docker images
-          aws ecr get-login-password --region ${{ secrets.AWS_DEFAULT_REGION  }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ env.DEV_IMAGE_TAG }}
-      # - name: Build public  Docker Image
-      #   if: (github.event_name == 'push' && github.ref == 'refs/heads/github_workflow_testing' && steps.check_file_changed.outputs.docker_package_changed == 'true')
-      #   env:
-      #     REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
-      #     ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+      # - name: Build Docker Image Conditionally
+      #   if: (github.event_name == 'push' && github.ref == 'refs/heads/master' && steps.check_file_changed.outputs.docker_package_changed == 'true')
+      #   env: 
+      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
       #     DEV_IMAGE_TAG: dev
       #   run: |
-      #     docker build -t public.ecr.aws/${{ secrets.AWS_ACCOUNT_ID }}/${{ env.ECR_REPOSITORY }}:${{ env.DEV_IMAGE_TAG }} .
+      #     docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION  }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ env.DEV_IMAGE_TAG }} .
       #     docker images
-      #     aws ecr-public get-login-password --region ${{ secrets.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin public.ecr.aws
-      #     docker push public.ecr.aws/${{ secrets.AWS_ACCOUNT_ID }}/${{ env.ECR_REPOSITORY }}:${{ env.DEV_IMAGE_TAG }}
+      #     aws ecr get-login-password --region ${{ secrets.AWS_DEFAULT_REGION  }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com
+      #     docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ env.DEV_IMAGE_TAG }}
+      - name: Build public  Docker Image
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/github_workflow_testing' && steps.check_file_changed.outputs.docker_package_changed == 'true')
+        env:
+          REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+          DEV_IMAGE_TAG: dev
+        run: |
+          docker build -t public.ecr.aws/${{ secrets.AWS_ACCOUNT_ID }}/${{ env.ECR_REPOSITORY }}:${{ env.DEV_IMAGE_TAG }} .
+          docker images
+          aws ecr-public get-login-password --region ${{ secrets.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin public.ecr.aws
+          docker push public.ecr.aws/${{ secrets.AWS_ACCOUNT_ID }}/${{ env.ECR_REPOSITORY }}:${{ env.DEV_IMAGE_TAG }}
 
   build-dev:
     name: build-dev
