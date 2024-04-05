@@ -21,7 +21,7 @@ RUN npm install --legacy-peer-deps --max-old-space-size=4096 --unsafe-perm=true 
 
 # Install development dependencies
 
-    && npm install -g npm-audit-html \
+     npm install -g npm-audit-html \
     && npm install -g serverless@2.71.0
 
 # Set Node.js options
