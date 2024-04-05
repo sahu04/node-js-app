@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-     "format:check-safe": "npm run format:check || true"
+     "format:check": "prettier --check ."
   },
   "repository": {
     "type": "git",
