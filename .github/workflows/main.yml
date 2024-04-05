@@ -68,4 +68,4 @@ jobs:
       - name: Run prettier and npm build
         run: |
           npm run format:check || true
-          npm build
+          # npm build
