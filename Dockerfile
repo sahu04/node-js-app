@@ -14,3 +14,4 @@ RUN npm install -g serverless@2.71.0
 RUN apk add python3 py-pip
 #RUN pip install awscli
 RUN pip install PyYAML==5.3.1 && pip install awscli
+
