@@ -10,7 +10,7 @@ RUN apk add --update \
 
 # Install AWS CLI using pip
 RUN pip3 install awscli
-
+RUN npm install --save-dev prettier 
 # Set up working directory
 RUN mkdir /cache
 WORKDIR /cache
@@ -20,7 +20,7 @@ COPY package.json ./
 RUN npm install --legacy-peer-deps --max-old-space-size=4096 --unsafe-perm=true --production=false
 
 # Install development dependencies
-RUN npm install --save-dev prettier \
+
     && npm install -g npm-audit-html \
     && npm install -g serverless@2.71.0
 
