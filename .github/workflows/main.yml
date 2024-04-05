@@ -10,102 +10,62 @@ env:
   AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
   ECR_REPOSITORY_DEV: ${{ secrets.ECR_REPOSITORY_DEV }}
   ECR_REPOSITORY_PROD: ${{ secrets.ECR_REPOSITORY_PROD }}
-# S3_BUCKET_NAME_DEV: ${{ secrets.S3_BUCKET_NAME_DEV }}
-# S3_BUCKET_NAME_PROD: ${{ secrets.S3_BUCKET_NAME_PROD }}
-# CDN_DISTRIBUTION_ID_DEV: ${{ secrets.CDN_DISTRIBUTION_ID_DEV }}
-# CDN_DISTRIBUTION_ID_PROD: ${{ secrets.CDN_DISTRIBUTION_ID_PROD }}
 
 jobs:
   conditional_step:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-      with:
-        # Checkout as many commits as needed for the diff
-        fetch-depth: 2
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-           aws-region: ap-south-1
-    - name: Check for Dockerfile or package.json changes
-      id: check_file_changed
-      run: |
-        # Diff HEAD with the previous commit
-        diff=$(git diff --name-only HEAD^ HEAD)
-        
-        # Check if Dockerfile or package.json has changed (added, modified, deleted)
-        if echo "$diff" | grep -qE '^(Dockerfile|package\.json)$'; then
-          echo "docker_package_changed=true" >> $GITHUB_OUTPUT
-        else
-          echo "docker_package_changed=false" >> $GITHUB_OUTPUT
-        fi
-    # - name: Login to Amazon ECR Public
-    #   id: login-ecr-public
-    #   uses: aws-actions/amazon-ecr-login@v2
-    #   with:
-    #       registry-type: public    
-    - name: Build Docker Image
-      env:
-       REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
-       ECR_REPOSITORY: testing-dev1
-       DEV_IMAGE_TAG: dev
-       run: |
-         docker build -t public.ecr.aws/${{ secrets.AWS_ACCOUNT_ID }}/${{ env.ECR_REPOSITORY }}:${{ env.DEV_IMAGE_TAG }} .
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      - name: Check for Dockerfile or package.json changes
+        id: check_file_changed
+        run: |
+          diff=$(git diff --name-only HEAD^ HEAD)
+          if echo "$diff" | grep -qE '^(Dockerfile|package\.json)$'; then
+            echo "docker_package_changed=true" >> $GITHUB_ENV
+          else
+            echo "docker_package_changed=false" >> $GITHUB_ENV
+          fi
+
+      - name: Build Docker Image
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/prod')
+        env:
+          REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
+          ECR_REPOSITORY: testing-dev1
+          DEV_IMAGE_TAG: dev
+        run: |
+          docker build -t public.ecr.aws/${{ secrets.AWS_ACCOUNT_ID }}/${{ env.ECR_REPOSITORY }}:${{ env.DEV_IMAGE_TAG }} .
           docker images
           aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
-         docker push public.ecr.aws/${{ secrets.AWS_ACCOUNT_ID }}/${{ env.ECR_REPOSITORY }}:${{ env.DEV_IMAGE_TAG }}
-
-      # env: 
-      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     DEV_IMAGE_TAG: dev
-      # run: |
-      #   # docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION  }}.amazonaws.com/testing-dev1:${{ env.DEV_IMAGE_TAG }} .
-      #    docker build -t testing-dev1 .
-      #    docker images
-      #     # aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/v1u7p7d8
-      #     - name: Login to Amazon ECR Public
-      #      aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.ECR_PUBLIC_REGISTRY_URL }}
-      #     docker tag testing-dev1:latest public.ecr.aws/v1u7p7d8/testing-dev1:dev
-      #     docker push public.ecr.aws/v1u7p7d8/testing-dev1:dev
-      #    # aws ecr get-login-password --region ${{ secrets.AWS_DEFAULT_REGION  }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com
-      #      #docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/testing-dev1:${{ env.DEV_IMAGE_TAG }}
-
-      
-    # - name: Pull Docker Image Conditionaly
-    #   if: steps.check_file_changed.outputs.docker_package_changed == 'true'
-    #   env: 
-    #         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-    #         IMAGE_TAG: prod
-    #         DEV_IMAGE_TAG: dev
-    #   run: |
-    #    docker pull $ECR_REGISTRY/$ECR_REPOSITORY_DEV:$DEV_IMAGE_TAG
-    #    docker tag $ECR_REGISTRY/$ECR_REPOSITORY_DEV:$DEV_IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY_PROD:$IMAGE_TAG
-    #    docker push $ECR_REGISTRY/$ECR_REPOSITORY_PROD:$IMAGE_TAG
+          docker push public.ecr.aws/${{ secrets.AWS_ACCOUNT_ID }}/${{ env.ECR_REPOSITORY }}:${{ env.DEV_IMAGE_TAG }}
 
   build-dev:
     name: build-dev
     runs-on: ubuntu-latest
     container:
       image:  public.ecr.aws/v1u7p7d8/testing-dev1:dev
-    if: (github.event_name == 'push' && github.ref == 'refs/heads/master')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-           aws-region: ap-south-1
-      - name: Run prettier
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      - name: Run prettier and npm build
         run: |
-         npm run format:check || true
-         npm build
-        
-    # - name: Deploy build to S3
-    #   run: |
-    #       npm run deploy-dev
-    #       aws s3 sync --delete build s3://s3-bucket-github --acl public-read
-    #       # aws cloudfront create-invalidation --distribution-id=${{ secrets.CDN_DISTRIBUTION_ID_DEV }} --paths "/*"
+          npm run format:check || true
+          npm build
