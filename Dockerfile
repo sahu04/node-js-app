@@ -6,7 +6,8 @@ RUN apk add jq
 RUN mkdir /cache
 WORKDIR /cache
 COPY package.json ./
-RUN yarn global add prettier
+# RUN yarn global add prettier
+RUN npm install -g env-cmd prettier
 RUN npm install --legacy-peer-deps 
 RUN npm install -g npm-audit-html
 RUN npm install -g serverless@2.71.0
